@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+    <style>
+        html {background-color: white;}
+        code {color:green;}
+    </style>
+</head>
+<body>
+<pre><code></code></pre>
+<script>
+    (function() {
+        var send = window.callPhantom ? window.callPhantom : function(){};
+
+        var i = 0;
+        var code = '<style type="text/css">\nspan.label {color:black;width:30;height:16;text-align:center;margin-top:0;background:#ffF;font:bold 13px Arial}\nspan.c1 {cursor:hand;color:black;width:30;height:16;text-align:center;margin-top:0;background:#ffF;font:bold 13px Arial}\nspan.c2 {cursor:hand;color:red;width:30;height:16;text-align:center;margin-top:0;background:#ffF;font:bold 13px Arial}\nspan.c3 {cursor:hand;color:#b0b0b0;width:30;height:16;text-align:center;margin-top:0;background:#ffF;font:bold 12px Arial}\n</style>';
+
+        var e = document.querySelector('code');
+        var renderNextLetter = function() {
+            var c = code.charAt(i++);
+            if (c !== '') {
+                e.textContent += c;
+                if (send({msg:'renderReady',data:i/code.length})) {
+                    window.requestAnimationFrame(renderNextLetter);
+                } else {
+                    send({msg:'error'});
+                }
+            } else {
+                send({msg:'exit'});
+            }
+        };
+        setTimeout(renderNextLetter,1000);
+    })();
+</script>
+</body>
+</html>

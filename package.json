@@ -1,0 +1,17 @@
+{
+  "name": "typer",
+  "version": "1.0.0",
+  "description": "Animate typing",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "phantomjs",
+    "animation"
+  ],
+  "author": "Henrik Paul <henrik.paul@gmail.com>",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "phantomjs-prebuilt": "2"
+  }
+}
