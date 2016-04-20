@@ -14,32 +14,52 @@
         var ERROR = {event:'error'};
         var EXIT = {event:'exit'};
         var PROVIDECODE = {event:'provideCode'};
+        var codeElement = document.querySelector('code');
+        var renderRequest = 0;
 
-        var send = window.callPhantom ? window.callPhantom : function(data){console.log(JSON.stringify(data))};
+        var phantomIsPresent = function() { return typeof window.callPhantom === 'function'; };
 
-        var i = 0;
-        var code = send(PROVIDECODE);
-        if (!code) {
-            send(ERROR);
-            document.body.innerHTML = '<h1>Could not get code!</h1>';
-            return;
-        }
+        var render = function(code) {
+            codeElement.textContent = '';
+            window.cancelAnimationFrame(renderRequest);
 
-        var e = document.querySelector('code');
-        var renderNextLetter = function() {
-            var c = code.charAt(i++);
-            if (c !== '') {
-                e.textContent += c;
-                if (send({event:'renderReady',msg:i/code.length})) {
-                    window.requestAnimationFrame(renderNextLetter);
+            var i = 0;
+            var renderNextLetter = function() {
+                var c = code.charAt(i++);
+                if (c !== '') {
+                    codeElement.textContent += c;
+                    if (!phantomIsPresent() || send({event:'renderReady',msg:i/code.length})) {
+                        renderRequest = window.requestAnimationFrame(renderNextLetter);
+                    } else {
+                        send(ERROR);
+                    }
                 } else {
-                    send(ERROR);
+                    send(EXIT);
                 }
-            } else {
-                send(EXIT);
-            }
+            };
+            renderNextLetter();
         };
-        setTimeout(renderNextLetter,1000);
+
+        var send = phantomIsPresent() ? window.callPhantom : function(data){console.log(JSON.stringify(data))};
+
+        if (phantomIsPresent()) {
+            var code = send(PROVIDECODE);
+            if (!code) send(ERROR);
+            else render(code);
+        } else {
+            var textarea = document.createElement('textarea');
+            textarea.style.width = '600px';
+            textarea.style.height = '300px';
+
+            var button = document.createElement('button');
+            button.textContent = 'Type';
+            button.addEventListener('click', function() {
+                render(textarea.value);
+            });
+
+            document.body.insertBefore(button, document.body.firstChild);
+            document.body.insertBefore(textarea, document.body.firstChild);
+        }
     })();
 </script>
 </body>
