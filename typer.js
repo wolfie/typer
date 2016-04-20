@@ -1,4 +1,5 @@
 var page = require('webpage').create();
+var fs = require('fs');
 var isOpen = false;
 var frame = 0;
 var PAD = '00000'; // over 27mins @ 60fps
@@ -29,7 +30,7 @@ page.open('test.html', function(status) {
 });
 
 page.onCallback = function(data) {
-    switch (data.msg) {
+    switch (data.event) {
         case 'exit':
             console.log('Hot exit signal from client. All ok.');
             phantom.exit(0);
@@ -37,7 +38,7 @@ page.onCallback = function(data) {
         case 'renderReady':
             if (isOpen) {
                 var filename = 'frames/frame'+leftPad5(frame++)+'.png';
-                console.log(filename, leftPad5((100*data.data).toFixed(1))+'%');
+                console.log(filename, leftPad5((100*data.msg).toFixed(1))+'%');
                 page.render(filename, {format: 'png'});
             }
             else {
@@ -45,8 +46,10 @@ page.onCallback = function(data) {
                 phantom.exit(1);
             }
             break;
+        case 'provideCode':
+            return fs.read('CODE.txt');
         default:
-            console.log('unknown data: '+JSON.stringify(data));
+            console.log('unknown event: '+JSON.stringify(data));
             phantom.exit(0);
     }
     return true;

@@ -1,0 +1,22 @@
+(function() {
+    var send = window.callPhantom ? window.callPhantom : function(){};
+
+    var i = 0;
+    var code = '';
+
+    var e = document.querySelector('code');
+    var renderNextLetter = function() {
+        var c = code.charAt(i++);
+        if (c !== '') {
+            e.textContent += c;
+            if (send({msg:'renderReady',data:i/code.length})) {
+                window.requestAnimationFrame(renderNextLetter);
+            } else {
+                send({msg:'error'});
+            }
+        } else {
+            send({msg:'exit'});
+        }
+    };
+    setTimeout(renderNextLetter,1000);
+})();

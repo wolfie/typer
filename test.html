@@ -11,23 +11,32 @@
 <pre><code></code></pre>
 <script>
     (function() {
-        var send = window.callPhantom ? window.callPhantom : function(){};
+        var ERROR = {event:'error'};
+        var EXIT = {event:'exit'};
+        var PROVIDECODE = {event:'provideCode'};
+
+        var send = window.callPhantom ? window.callPhantom : function(data){console.log(JSON.stringify(data))};
 
         var i = 0;
-        var code = '<style type="text/css">\nspan.label {color:black;width:30;height:16;text-align:center;margin-top:0;background:#ffF;font:bold 13px Arial}\nspan.c1 {cursor:hand;color:black;width:30;height:16;text-align:center;margin-top:0;background:#ffF;font:bold 13px Arial}\nspan.c2 {cursor:hand;color:red;width:30;height:16;text-align:center;margin-top:0;background:#ffF;font:bold 13px Arial}\nspan.c3 {cursor:hand;color:#b0b0b0;width:30;height:16;text-align:center;margin-top:0;background:#ffF;font:bold 12px Arial}\n</style>';
+        var code = send(PROVIDECODE);
+        if (!code) {
+            send(ERROR);
+            document.body.innerHTML = '<h1>Could not get code!</h1>';
+            return;
+        }
 
         var e = document.querySelector('code');
         var renderNextLetter = function() {
             var c = code.charAt(i++);
             if (c !== '') {
                 e.textContent += c;
-                if (send({msg:'renderReady',data:i/code.length})) {
+                if (send({event:'renderReady',msg:i/code.length})) {
                     window.requestAnimationFrame(renderNextLetter);
                 } else {
-                    send({msg:'error'});
+                    send(ERROR);
                 }
             } else {
-                send({msg:'exit'});
+                send(EXIT);
             }
         };
         setTimeout(renderNextLetter,1000);
