@@ -29,7 +29,7 @@ page.onCallback = function(data) {
         case 'waitForPhantomJsReady':
             return !isOpen;
         case 'exit':
-            console.log('Hot exit signal from client. All ok.');
+            console.log('Got exit signal from client. All ok.');
             phantom.exit(0);
             break;
         case 'renderReady':

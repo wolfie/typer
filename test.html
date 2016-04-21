@@ -2,14 +2,12 @@
 <html>
 <head>
     <title>Test</title>
+    <link rel="stylesheet" href="google-code-prettify/prettify.css">
+    <link rel="stylesheet" href="prettify-desert.css">
     <style>
         html {
-            background-color: white;
-        }
-        #code {
-            color: black;
-            position: absolute;
-            top: 0;
+            background-color: #333;
+            height: 100%
         }
         #codewrapper {
             position: relative;
@@ -18,7 +16,8 @@
             position: absolute;
             width: 100%;
             top: 0;
-            background-color: #E2F9E1;
+            background-color: #394639;
+            z-index: 0;
         }
         #caret {
             height: 100%;
@@ -26,18 +25,33 @@
             top: 0;
             background-color: #46C146;
         }
+
+        /* override default style */
+        pre.prettyprint {
+            padding: 0;
+            border: 0;
+            background-color: transparent;
+        }
+
+        pre {
+            z-index: 1;
+            position: absolute;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
 <div id="codewrapper">
     <div id="linemarker"><div id="caret"></div></div>
-    <pre><code id="code"></code></pre>
+    <pre><code id="code" class="language-js"></code></pre>
 </div>
+<script src="google-code-prettify/prettify.js"></script>
 <script>
     setTimeout(function() {
         var linemarker = document.getElementById('linemarker');
         var caret = document.getElementById('caret');
         var codeElement = document.getElementById('code');
+        var preElement = document.querySelector('pre');
 
         // init styles
 
@@ -73,6 +87,7 @@
             var sourceIndex = 0;
             linemarker.style.top = 0;
             caret.style.left = 0;
+            var codeBuffer = '';
 
             var renderNextLetter = function() {
                 var c = code.charAt(sourceIndex++);
@@ -89,7 +104,11 @@
 
                 caret.style.left = (caretWidth*column)+'px';
 
-                codeElement.textContent += c;
+                codeBuffer += c;
+                codeElement.textContent = codeBuffer;
+                preElement.className = 'prettyprint';
+                PR.prettyPrint();
+
                 send({event:'renderReady',msg:sourceIndex/code.length});
                 renderRequest = window.requestAnimationFrame(renderNextLetter);
             };
