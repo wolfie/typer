@@ -3,50 +3,110 @@
 <head>
     <title>Test</title>
     <style>
-        html {background-color: white;}
-        code {color:green;}
+        html {
+            background-color: white;
+        }
+        #code {
+            color: black;
+            position: absolute;
+            top: 0;
+        }
+        #codewrapper {
+            position: relative;
+        }
+        #linemarker {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            background-color: #E2F9E1;
+        }
+        #caret {
+            height: 100%;
+            position: absolute;
+            top: 0;
+            background-color: #46C146;
+        }
     </style>
 </head>
 <body>
-<pre><code></code></pre>
+<div id="codewrapper">
+    <div id="linemarker"><div id="caret"></div></div>
+    <pre><code id="code"></code></pre>
+</div>
 <script>
-    (function() {
+    setTimeout(function() {
+        var linemarker = document.getElementById('linemarker');
+        var caret = document.getElementById('caret');
+        var codeElement = document.getElementById('code');
+
+        // init styles
+
+        codeElement.textContent = '123456789012345678901234567890';
+        var lineHeight = codeElement.offsetHeight;
+        linemarker.style.height = lineHeight+"px";
+        linemarker.style.top = 0;
+
+        var caretWidth = codeElement.offsetWidth / codeElement.textContent.length;
+        caret.style.width = caretWidth+'px';
+        caret.style.left = 0;
+
+        codeElement.textContent = '';
+
+
+        // start rendering
+
         var ERROR = {event:'error'};
         var EXIT = {event:'exit'};
-        var PROVIDECODE = {event:'provideCode'};
-        var codeElement = document.querySelector('code');
+        var PROVIDE_CODE = {event:'provideCode'};
+        var WAIT_FOR_PHANTOMJS_READY = {event:'waitForPhantomJsReady'};
         var renderRequest = 0;
 
         var phantomIsPresent = function() { return typeof window.callPhantom === 'function'; };
+        var send = phantomIsPresent() ? window.callPhantom : function(data){console.log(JSON.stringify(data))};
 
         var render = function(code) {
             codeElement.textContent = '';
             window.cancelAnimationFrame(renderRequest);
 
-            var i = 0;
+            var line = 0;
+            var column = 0;
+            var sourceIndex = 0;
+            linemarker.style.top = 0;
+            caret.style.left = 0;
+
             var renderNextLetter = function() {
-                var c = code.charAt(i++);
-                if (c !== '') {
-                    codeElement.textContent += c;
-                    if (!phantomIsPresent() || send({event:'renderReady',msg:i/code.length})) {
-                        renderRequest = window.requestAnimationFrame(renderNextLetter);
-                    } else {
-                        send(ERROR);
-                    }
-                } else {
+                var c = code.charAt(sourceIndex++);
+                column++;
+
+                if (c === '') {
                     send(EXIT);
+                    return;
+                } else if (c === '\n') {
+                    line++;
+                    column = 0;
+                    linemarker.style.top = (line*lineHeight)+'px';
                 }
+
+                caret.style.left = (caretWidth*column)+'px';
+
+                codeElement.textContent += c;
+                send({event:'renderReady',msg:sourceIndex/code.length});
+                renderRequest = window.requestAnimationFrame(renderNextLetter);
             };
             renderNextLetter();
         };
 
-        var send = phantomIsPresent() ? window.callPhantom : function(data){console.log(JSON.stringify(data))};
-
         if (phantomIsPresent()) {
-            var code = send(PROVIDECODE);
+
+            // busy loop until phantomjs realizes that it already has connected to the page
+            while (send(WAIT_FOR_PHANTOMJS_READY)) {}
+
+            var code = send(PROVIDE_CODE);
             if (!code) send(ERROR);
             else render(code);
-        } else {
+        }
+
+        else {
             var textarea = document.createElement('textarea');
             textarea.style.width = '600px';
             textarea.style.height = '300px';
@@ -60,7 +120,7 @@
             document.body.insertBefore(button, document.body.firstChild);
             document.body.insertBefore(textarea, document.body.firstChild);
         }
-    })();
+    }, 0);
 </script>
 </body>
 </html>

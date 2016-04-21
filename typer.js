@@ -9,11 +9,6 @@ var leftPad5 = function(num) {
     return (PAD+num).substring(num.length);
 };
 
-phantom.onError = function(msg, trace) {
-    console.error(msg);
-    phantom.exit(1);
-};
-
 page.viewportSize = {
     width: 1280,
     height: 720
@@ -31,6 +26,8 @@ page.open('test.html', function(status) {
 
 page.onCallback = function(data) {
     switch (data.event) {
+        case 'waitForPhantomJsReady':
+            return !isOpen;
         case 'exit':
             console.log('Hot exit signal from client. All ok.');
             phantom.exit(0);
@@ -42,7 +39,7 @@ page.onCallback = function(data) {
                 page.render(filename, {format: 'png'});
             }
             else {
-                console.error('Page was not open, but still got event. Sleep for a bit longer?');
+                console.error('wait for waitForPhantomJsReady before rendering');
                 phantom.exit(1);
             }
             break;
