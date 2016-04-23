@@ -30,7 +30,7 @@ page.viewportSize = {
     height: 720
 };
 
-page.open('frontend/test.html', function(status) {
+page.open('frontend/index.html', function(status) {
     isOpen = true;
     if (status === 'fail') {
         console.error('Page open failed. exited.');
