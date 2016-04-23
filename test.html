@@ -1,51 +1,68 @@
 <!DOCTYPE html>
+
+<!--
+    Copyright 2016 Henrik Paul
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
 <html>
 <head>
     <title>Test</title>
-    <link rel="stylesheet" href="google-code-prettify/prettify.css">
-    <link rel="stylesheet" href="prettify-desert.css">
-    <style>
-        html {
-            background-color: #333;
-            height: 100%
-        }
-        #codewrapper {
-            position: relative;
-        }
-        #linemarker {
-            position: absolute;
-            width: 100%;
-            top: 0;
-            background-color: #394639;
-            z-index: 0;
-        }
-        #caret {
-            height: 100%;
-            position: absolute;
-            top: 0;
-            background-color: #46C146;
-        }
-
-        /* override default style */
-        pre.prettyprint {
-            padding: 0;
-            border: 0;
-            background-color: transparent;
-        }
-
-        pre {
-            z-index: 1;
-            position: absolute;
-            margin: 0;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/google/code-prettify/master/styles/desert.css">
 </head>
 <body>
 <div id="codewrapper">
     <div id="linemarker"><div id="caret"></div></div>
     <pre><code id="code" class="language-js"></code></pre>
 </div>
-<script src="google-code-prettify/prettify.js"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+<style scoped>
+    html {
+        background-color: #333;
+        height: 100%
+    }
+    #codewrapper {
+        position: relative;
+    }
+    #linemarker {
+        position: absolute;
+        width: 100%;
+        top: 0;
+        background-color: #394639;
+        z-index: 0;
+    }
+    #caret {
+        height: 100%;
+        position: absolute;
+        top: 0;
+        background-color: #46C146;
+    }
+
+    /* override default style */
+    pre.prettyprint {
+        padding: 0;
+        border: 0;
+        background-color: transparent;
+    }
+
+    pre {
+        z-index: 1;
+        position: absolute;
+        margin: 0;
+    }
+</style>
+
 <script>
     setTimeout(function() {
         var linemarker = document.getElementById('linemarker');
