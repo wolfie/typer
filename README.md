@@ -12,6 +12,10 @@
 
 This is inspired by [Bisqwit's programming videos](https://www.youtube.com/user/Bisqwit/videos)
 
+## Demo
+
+[![Typer test 3](http://img.youtube.com/vi/nbAicv7o2QM/0.jpg)](http://www.youtube.com/watch?v=nbAicv7o2QM "Typer test 3")
+
 ## Caveats
 
 * Scripts are curretly only for Windows, but I don't see a reason to why 
@@ -35,10 +39,6 @@ This is inspired by [Bisqwit's programming videos](https://www.youtube.com/user/
 You can also just open the local `test.html` file in your browser and 
 play around with the input there. It tries to render at 60fps, but that 
 all depends on the computer and code length.
-
-## Demo
-
-[![Typer test 3](http://img.youtube.com/vi/nbAicv7o2QM/0.jpg)](http://www.youtube.com/watch?v=nbAicv7o2QM "Typer test 3")
 
 ## License
 
