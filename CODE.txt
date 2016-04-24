@@ -1,22 +1,23 @@
-(function() {
-    var send = window.callPhantom ? window.callPhantom : function(){};
-
-    var i = 0;
-    var code = '';
-
-    var e = document.querySelector('code');
-    var renderNextLetter = function() {
-        var c = code.charAt(i++);
-        if (c !== '') {
-            e.textContent += c;
-            if (send({msg:'renderReady',data:i/code.length})) {
-                window.requestAnimationFrame(renderNextLetter);
-            } else {
-                send({msg:'error'});
-            }
-        } else {
-            send({msg:'exit'});
-        }
-    };
-    setTimeout(renderNextLetter,1000);
-})();
+:js
+10	(function() {
+20	    var send = window.callPhantom ? window.callPhantom : function(){};
+20
+20	    var i = 0;
+20	    var code = '';
+20
+20	    var e = document.querySelector('code');
+20	    var renderNextLetter = function() {
+20	        var c = code.charAt(i++);
+20	        if (c !== '') {
+20	            e.textContent += c;
+30	            if (send({msg:'renderReady',data:i/code.length})) {
+30	                window.requestAnimationFrame(renderNextLetter);
+30	            } else {
+30	                send({msg:'error'});
+30	            }
+20	        } else {
+20	            send({msg:'exit'});
+20	        }
+20	    };
+20	    setTimeout(renderNextLetter,1000);
+10	})();

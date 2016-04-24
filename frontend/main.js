@@ -45,41 +45,61 @@ window.start = function() {
     var phantomIsPresent = function() { return typeof window.callPhantom === 'function'; };
     var send = phantomIsPresent() ? window.callPhantom : function(data){console.log(JSON.stringify(data))};
 
+    var moveCaretTo = function(line, column) {
+        linemarker.style.top = (lineHeight * line) + 'px';
+        caret.style.left = (caretWidth * column) + 'px';
+    };
+
+
     var render = function(code) {
+        var listing = new CodeListing(code);
+        codeElement.className = '_language-'+listing.getLanguage();
         codeElement.textContent = '';
         window.cancelAnimationFrame(renderRequest);
 
         var line = 0;
         var column = 0;
-        var sourceIndex = 0;
-        linemarker.style.top = 0;
-        caret.style.left = 0;
-        var codeBuffer = '';
+        var rawBuiltSource = '';
+        var bucketOrdinal = 0;
+        var bucketLineOrdinal = 0;
 
-        var renderNextLetter = function() {
-            var c = code.charAt(sourceIndex++);
-            column++;
-
-            if (c === '') {
-                send(EXIT);
-                return;
-            } else if (c === '\n') {
-                line++;
-                column = 0;
-                linemarker.style.top = (line*lineHeight)+'px';
-            }
-
-            caret.style.left = (caretWidth*column)+'px';
-
-            codeBuffer += c;
-            codeElement.textContent = codeBuffer;
+        var renderFrame = function() {
+            moveCaretTo(line, column);
+            codeElement.textContent = rawBuiltSource;
             preElement.className = 'prettyprint';
             PR.prettyPrint();
 
-            send({event:'renderReady',msg:sourceIndex/code.length});
-            renderRequest = window.requestAnimationFrame(renderNextLetter);
+            var progress = rawBuiltSource.length / listing.getSource().length;
+            send({event:'renderReady',msg:progress});
         };
-        renderNextLetter();
+
+        var renderLoop = function() {
+            var bucket = listing.getBucket(bucketOrdinal);
+            if (bucket) {
+                var bucketLine = bucket.getLine(bucketLineOrdinal);
+                if (bucketLine) {
+                    var char = bucketLine.source.charAt(column);
+                    if (char !== '') {
+                        rawBuiltSource += char;
+                        column++;
+                    } else {
+                        rawBuiltSource += '\n';
+                        bucketLineOrdinal++;
+                        line++;
+                        column = 0;
+                    }
+
+                    renderFrame();
+                } else {
+                    bucketOrdinal++;
+                    bucketLineOrdinal = 0;
+                }
+                window.requestAnimationFrame(renderLoop);
+            } else {
+                send(EXIT);
+            }
+        };
+        renderLoop();
     };
 
     if (phantomIsPresent()) {
